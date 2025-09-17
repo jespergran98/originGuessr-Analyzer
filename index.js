@@ -246,9 +246,11 @@ class ArtifactAnalyzer {
     getScoreByMode(artifact, mode) {
         switch (mode) {
             case 'aspect-ratio':
-                return artifact.aspectRatioScore;
+                // Double the score since aspect ratio alone is out of 50, but we want 0-100 scale
+                return Math.min(100, artifact.aspectRatioScore * 2);
             case 'pixel-size':
-                return artifact.pixelSizeScore;
+                // Double the score since pixel size alone is out of 50, but we want 0-100 scale
+                return Math.min(100, artifact.pixelSizeScore * 2);
             default:
                 return artifact.imageQualityScore;
         }
@@ -915,56 +917,63 @@ class ArtifactAnalyzer {
         `;
     }
 
-    createImageQualityDisplay(artifact, rank) {
-        let qualityText = '';
-        
-        switch (this.imageQualityMode) {
-            case 'aspect-ratio':
-                const ratioText = artifact.aspectRatio ? artifact.aspectRatio.toFixed(2) : 'N/A';
-                qualityText = `Aspect Ratio: ${ratioText} (Score: ${artifact.aspectRatioScore}/100)`;
-                break;
-            case 'pixel-size':
-                const pixelText = artifact.pixelSize ? artifact.pixelSize.toLocaleString() : 'N/A';
-                qualityText = `Pixels: ${pixelText} (Score: ${artifact.pixelSizeScore}/100)`;
-                break;
-            default:
-                qualityText = `Overall Quality: ${artifact.imageQualityScore}/100 (${artifact.imageQuality})`;
-        }
-        
-        return `
-            <div class="artifact-title">#${rank}. ${this.escapeHtml(artifact.title)}</div>
-            <div class="artifact-description-full">${qualityText}</div>
-        `;
+createImageQualityDisplay(artifact, rank) {
+    let qualityText = '';
+    
+    switch (this.imageQualityMode) {
+        case 'aspect-ratio':
+            const ratioText = artifact.aspectRatio ? artifact.aspectRatio.toFixed(2) : 'N/A';
+            // Double the score for a 0-100 scale
+            const arScore = Math.min(100, artifact.aspectRatioScore * 2);
+            qualityText = `Aspect Ratio: ${ratioText} (Score: ${arScore}/100)`;
+            break;
+        case 'pixel-size':
+            const pixelText = artifact.pixelSize ? artifact.pixelSize.toLocaleString() : 'N/A';
+            // Double the score for a 0-100 scale
+            const psScore = Math.min(100, artifact.pixelSizeScore * 2);
+            qualityText = `Pixels: ${pixelText} (Score: ${psScore}/100)`;
+            break;
+        default:
+            qualityText = `Overall Quality: ${artifact.imageQualityScore}/100 (${artifact.imageQuality})`;
     }
+    
+    return `
+        <div class="artifact-title">#${rank}. ${this.escapeHtml(artifact.title)}</div>
+        <div class="artifact-description-full">${qualityText}</div>
+    `;
+}
 
-    createImageQualityBadge(artifact) {
-        if (!artifact.imageQuality || artifact.imageQualityScore === 0) {
-            return '<span class="image-quality-badge quality-loading">Analyzing...</span>';
-        }
-        
-        let score, qualityClass;
-        
-        switch (this.imageQualityMode) {
-            case 'aspect-ratio':
-                score = artifact.aspectRatioScore;
-                break;
-            case 'pixel-size':
-                score = artifact.pixelSizeScore;
-                break;
-            default:
-                score = artifact.imageQualityScore;
-        }
-        
-        if (score >= 80) {
-            qualityClass = 'quality-high';
-        } else if (score >= 45) {
-            qualityClass = 'quality-medium';
-        } else {
-            qualityClass = 'quality-low';
-        }
-        
-        return `<span class="image-quality-badge ${qualityClass}">${score}/100</span>`;
+createImageQualityBadge(artifact) {
+    if (!artifact.imageQuality || artifact.imageQualityScore === 0) {
+        return '<span class="image-quality-badge quality-loading">Analyzing...</span>';
     }
+    
+    let score, qualityClass;
+    
+    switch (this.imageQualityMode) {
+        case 'aspect-ratio':
+            // Double the score to scale it from 0-50 to 0-100 for display
+            score = Math.min(100, artifact.aspectRatioScore * 2);
+            break;
+        case 'pixel-size':
+            // Double the score to scale it from 0-50 to 0-100 for display
+            score = Math.min(100, artifact.pixelSizeScore * 2);
+            break;
+        default:
+            score = artifact.imageQualityScore;
+    }
+    
+    // Quality class logic now works correctly with the 0-100 scaled score
+    if (score >= 80) {
+        qualityClass = 'quality-high';
+    } else if (score >= 45) {
+        qualityClass = 'quality-medium';
+    } else {
+        qualityClass = 'quality-low';
+    }
+    
+    return `<span class="image-quality-badge ${qualityClass}">${score}/100</span>`;
+}
 
     setupEventListeners() {
         this.setupSortingControls();
