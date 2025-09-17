@@ -728,7 +728,7 @@ class ArtifactAnalyzer {
 
     createImageQualityBadge(artifact) {
         if (!artifact.imageQuality || artifact.imageQualityScore === 0) {
-            return '<span class="image-quality-badge quality-loading">Analyzing...</span>';
+            return '<span class="artifact-badge">🖼️ Qual: Analyzing...</span>';
         }
         
         let qualityClass = 'quality-medium';
@@ -738,7 +738,7 @@ class ArtifactAnalyzer {
             qualityClass = 'quality-low';
         }
         
-        return `<span class="image-quality-badge ${qualityClass}">${artifact.imageQualityScore}/100</span>`;
+        return `<span class="artifact-badge">🖼️ Quality: ${artifact.imageQualityScore}/100</span>`;
     }
 
     setupEventListeners() {
@@ -1042,7 +1042,7 @@ class ArtifactAnalyzer {
                     </div>
                     <div class="meta-row">
                         <span class="meta-icon" aria-hidden="true">🖼️</span>
-                        <span>Image Quality: ${artifact.imageQualityScore || 0}/100 (${artifact.imageQuality || 'Analyzing...'})</span>
+                        <span>Image Quality: ${artifact.imageQualityScore > 0 ? `${artifact.imageQualityScore}/100 (${artifact.imageQuality})` : 'Analyzing...'}</span>
                     </div>
                 </div>
                 <div class="artifact-mini-map" id="miniMap-${this.generateSafeId(artifact)}">
