@@ -20,6 +20,10 @@ class ArtifactAnalyzer {
         this.imageAnalysisProgress = { current: 0, total: 0 };
         this.imageModal = null;
         
+        // Track which artifacts have been analyzed
+        this.analyzedArtifacts = new Set();
+        this.priorityArtifacts = new Set();
+        
         // Bind methods to preserve context
         this.handleImageError = this.handleImageError.bind(this);
         this.handleSortChange = this.handleSortChange.bind(this);
@@ -46,7 +50,7 @@ class ArtifactAnalyzer {
             this.setupEventListeners();
             this.applySorting('year-newest');
             
-            // Start image quality analysis in the background
+            // Start image quality analysis in the background with priority
             this.startImageQualityAnalysis();
         } catch (error) {
             console.error('Error initializing analyzer:', error);
@@ -192,6 +196,34 @@ class ArtifactAnalyzer {
         this.averageImageQuality = 0; // Will be calculated after image analysis
     }
 
+    updatePriorityArtifacts() {
+        // Clear previous priorities
+        this.priorityArtifacts.clear();
+        
+        // Add artifacts that are currently visible or will be visible soon
+        const visibleCount = Math.min(this.displayedArtifacts + this.artifactsPerPage * 2, this.sortedArtifacts.length);
+        for (let i = 0; i < visibleCount; i++) {
+            if (this.sortedArtifacts[i]) {
+                this.priorityArtifacts.add(this.sortedArtifacts[i].id);
+            }
+        }
+        
+        // Add top 5 artifacts for each quality list
+        const highQualityArtifacts = [...this.artifacts]
+            .filter(a => a.imageQualityScore > 0)
+            .sort((a, b) => b.imageQualityScore - a.imageQualityScore)
+            .slice(0, 5);
+            
+        const lowQualityArtifacts = [...this.artifacts]
+            .filter(a => a.imageQualityScore > 0)
+            .sort((a, b) => a.imageQualityScore - b.imageQualityScore)
+            .slice(0, 5);
+            
+        [...highQualityArtifacts, ...lowQualityArtifacts].forEach(artifact => {
+            this.priorityArtifacts.add(artifact.id);
+        });
+    }
+
     async startImageQualityAnalysis() {
         if (this.imageAnalysisInProgress) return;
         this.imageAnalysisInProgress = true;
@@ -223,9 +255,11 @@ class ArtifactAnalyzer {
         });
 
         try {
+            // Update priority artifacts based on current sort
+            this.updatePriorityArtifacts();
+            
             await this.analyzeAllImageQualities();
             this.updateImageQualityStats();
-            this.updateImageQualityLists();
             
             // Update display after analysis is complete
             if (avgElement) {
@@ -264,9 +298,16 @@ class ArtifactAnalyzer {
             lowest: document.getElementById('lowestQualityProgress')
         };
 
+        // Sort artifacts by priority - priority artifacts first
+        const artifactsToAnalyze = [...this.artifacts].sort((a, b) => {
+            const aPriority = this.priorityArtifacts.has(a.id) ? 1 : 0;
+            const bPriority = this.priorityArtifacts.has(b.id) ? 1 : 0;
+            return bPriority - aPriority;
+        });
+
         // Process artifacts one by one to show progress
-        for (let i = 0; i < this.artifacts.length; i++) {
-            await this.analyzeImageQuality(this.artifacts[i]);
+        for (let i = 0; i < artifactsToAnalyze.length; i++) {
+            await this.analyzeImageQuality(artifactsToAnalyze[i]);
             
             this.imageAnalysisProgress.current = i + 1;
             
@@ -281,7 +322,7 @@ class ArtifactAnalyzer {
             // Update main quality display with running average
             const avgElement = document.getElementById('avgImageQuality');
             if (avgElement) {
-                const validScores = this.artifacts.slice(0, i + 1)
+                const validScores = this.artifacts
                     .filter(a => a.imageQualityScore > 0)
                     .map(a => a.imageQualityScore);
                 
@@ -295,11 +336,70 @@ class ArtifactAnalyzer {
                 `;
             }
             
+            // Update quality lists progressively every 5 analyses
+            if (i % 5 === 0 || this.priorityArtifacts.has(artifactsToAnalyze[i].id)) {
+                this.updateImageQualityListsProgressive();
+                
+                // Update visible artifact cards if they've been analyzed
+                this.updateVisibleArtifactCards();
+            }
+            
             // Small delay between analyses to prevent UI blocking
-            if (i % 5 === 0) {
+            if (i % 10 === 0) {
                 await this.delay(50);
             }
         }
+        
+        // Final update of all lists
+        this.updateImageQualityListsProgressive();
+        this.updateVisibleArtifactCards();
+    }
+
+    updateImageQualityListsProgressive() {
+        const analyzedArtifacts = this.artifacts.filter(a => a.imageQualityScore > 0);
+        
+        if (analyzedArtifacts.length === 0) return;
+        
+        const highestQuality = [...analyzedArtifacts]
+            .sort((a, b) => b.imageQualityScore - a.imageQualityScore)
+            .slice(0, 5);
+            
+        const lowestQuality = [...analyzedArtifacts]
+            .sort((a, b) => a.imageQualityScore - b.imageQualityScore)
+            .slice(0, 5);
+        
+        this.displayArtifactList('highestImageQualityList', highestQuality, 'imageQuality');
+        this.displayArtifactList('lowestImageQualityList', lowestQuality, 'imageQuality');
+    }
+
+    updateVisibleArtifactCards() {
+        // Update the image quality display in visible artifact cards
+        const visibleCards = document.querySelectorAll('.full-artifact-card');
+        visibleCards.forEach(card => {
+            const artifactTitle = card.querySelector('.full-artifact-title')?.textContent;
+            if (artifactTitle) {
+                const artifact = this.artifacts.find(a => a.title === artifactTitle);
+                if (artifact && artifact.imageQualityScore > 0) {
+                    const qualityElement = card.querySelector('.meta-row:last-child span:last-child');
+                    if (qualityElement && qualityElement.textContent.includes('Analyzing...')) {
+                        qualityElement.textContent = `Image Quality: ${artifact.imageQualityScore}/100 (${artifact.imageQuality})`;
+                    }
+                    
+                    // Update the badge
+                    const badge = card.querySelector('.image-quality-badge');
+                    if (badge && badge.classList.contains('quality-loading')) {
+                        badge.className = `image-quality-badge ${this.getQualityClass(artifact.imageQualityScore)}`;
+                        badge.textContent = `🖼️Quality: ${artifact.imageQualityScore}/100`;
+                    }
+                }
+            }
+        });
+    }
+
+    getQualityClass(score) {
+        if (score >= 80) return 'quality-high';
+        if (score >= 45) return 'quality-medium';
+        return 'quality-low';
     }
 
     async analyzeImageQuality(artifact) {
@@ -456,20 +556,6 @@ class ArtifactAnalyzer {
         } else {
             this.averageImageQuality = 0;
         }
-
-        // Create sorted arrays for image quality
-        this.artifactsByImageQuality = [...this.artifacts]
-            .filter(a => a.imageQualityScore > 0)
-            .sort((a, b) => b.imageQualityScore - a.imageQualityScore);
-        
-        this.artifactsByLowestImageQuality = [...this.artifacts]
-            .filter(a => a.imageQualityScore > 0)
-            .sort((a, b) => a.imageQualityScore - b.imageQualityScore);
-    }
-
-    updateImageQualityLists() {
-        this.displayArtifactList('highestImageQualityList', this.artifactsByImageQuality.slice(0, 5), 'imageQuality');
-        this.displayArtifactList('lowestImageQualityList', this.artifactsByLowestImageQuality.slice(0, 5), 'imageQuality');
     }
 
     calculateAuthorStats() {
@@ -593,7 +679,7 @@ class ArtifactAnalyzer {
         this.displayArtifactList('longestList', this.artifactsByLength.slice(0, 5), 'description');
         this.displayArtifactList('shortestList', this.artifactsByShortness.slice(0, 5), 'description');
         
-        // Image quality lists will be updated after analysis completes
+        // Image quality lists start empty and will be populated progressively
         this.displayArtifactList('highestImageQualityList', [], 'imageQuality');
         this.displayArtifactList('lowestImageQualityList', [], 'imageQuality');
     }
@@ -728,7 +814,7 @@ class ArtifactAnalyzer {
 
     createImageQualityBadge(artifact) {
         if (!artifact.imageQuality || artifact.imageQualityScore === 0) {
-            return '<span class="artifact-badge">🖼️ Qual: Analyzing...</span>';
+            return '<span class="image-quality-badge quality-loading">🖼️Analyzing...</span>';
         }
         
         let qualityClass = 'quality-medium';
@@ -738,7 +824,7 @@ class ArtifactAnalyzer {
             qualityClass = 'quality-low';
         }
         
-        return `<span class="artifact-badge">🖼️ Quality: ${artifact.imageQualityScore}/100</span>`;
+        return `<span class="image-quality-badge ${qualityClass}">🖼️Quality: ${artifact.imageQualityScore}/100</span>`;
     }
 
     setupEventListeners() {
@@ -784,6 +870,9 @@ class ArtifactAnalyzer {
 
         // Apply sorting logic
         this.sortedArtifacts = this.getSortedArtifacts(sortType);
+        
+        // Update priority artifacts for image analysis
+        this.updatePriorityArtifacts();
         
         this.updateSortInfo();
         this.loadMoreArtifacts();
@@ -968,6 +1057,11 @@ class ArtifactAnalyzer {
             this.sortedArtifacts.length
         );
         const artifactsToShow = this.sortedArtifacts.slice(this.displayedArtifacts, endIndex);
+
+        // Update priority artifacts to include newly visible ones
+        artifactsToShow.forEach(artifact => {
+            this.priorityArtifacts.add(artifact.id);
+        });
 
         // Use document fragment for better performance
         const fragment = document.createDocumentFragment();
