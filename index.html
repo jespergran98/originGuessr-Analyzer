@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artifact Statistics Dashboard</title>
+    <meta name="description" content="Comprehensive analysis dashboard for historical artifact collections">
+    
+    <!-- Preload critical fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin="" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" 
+            integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" 
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <!-- Image Preview Modal -->
+    <div id="imageModal" class="image-modal" style="display: none;">
+        <div class="image-modal-content">
+            <span class="image-modal-close">&times;</span>
+            <img id="modalImage" class="modal-image" alt="Full size preview">
+            <div class="image-modal-caption"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>🏺 Artifact Collection Statistics</h1>
+            <p class="subtitle">Comprehensive analysis of your historical artifact collection</p>
+        </header>
+
+        <!-- Statistics Overview Cards -->
+        <section class="stats-grid" aria-labelledby="stats-heading">
+            <h2 id="stats-heading" class="sr-only">Collection Statistics</h2>
+            
+            <div class="stat-card total-count">
+                <div class="stat-icon" aria-hidden="true">🏺</div>
+                <div class="stat-content">
+                    <h3>Total Artifacts</h3>
+                    <div class="stat-number" id="totalCount" aria-live="polite">Loading...</div>
+                </div>
+            </div>
+
+            <div class="stat-card avg-title-length">
+                <div class="stat-icon" aria-hidden="true">📝</div>
+                <div class="stat-content">
+                    <h3>Average Title Length</h3>
+                    <div class="stat-number" id="avgTitleLength" aria-live="polite">Loading...</div>
+                </div>
+            </div>
+
+            <div class="stat-card avg-length">
+                <div class="stat-icon" aria-hidden="true">📖</div>
+                <div class="stat-content">
+                    <h3>Average Description Length</h3>
+                    <div class="stat-number" id="avgLength" aria-live="polite">Loading...</div>
+                </div>
+            </div>
+
+            <div class="stat-card avg-image-quality">
+                <div class="stat-icon" aria-hidden="true">🖼️</div>
+                <div class="stat-content">
+                    <h3>Average Image Quality</h3>
+                    <div class="stat-number stat-number-small" id="avgImageQuality" aria-live="polite">
+                        <span class="main-text">Loading...</span>
+                        <span class="progress-text" id="imageQualityProgress"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card unique-licenses">
+                <div class="stat-icon" aria-hidden="true">⚖️</div>
+                <div class="stat-content">
+                    <h3>Unique Licenses</h3>
+                    <div class="stat-number" id="uniqueLicenses" aria-live="polite">Loading...</div>
+                </div>
+            </div>
+
+            <div class="stat-card year-range">
+                <div class="stat-icon" aria-hidden="true">📅</div>
+                <div class="stat-content">
+                    <h3>Year Range</h3>
+                    <div class="stat-number" id="yearRange" aria-live="polite">Loading...</div>
+                </div>
+            </div>
+
+            <div class="stat-card playable-count">
+                <div class="stat-icon" aria-hidden="true">🎮</div>
+                <div class="stat-content">
+                    <h3>Playable Artifacts</h3>
+                    <div class="stat-number" id="playableCount" aria-live="polite">Loading...</div>
+                </div>
+            </div>
+
+            <div class="stat-card non-playable-count">
+                <div class="stat-icon" aria-hidden="true">🚫</div>
+                <div class="stat-content">
+                    <h3>Non-Playable Artifacts</h3>
+                    <div class="stat-number" id="nonPlayableCount" aria-live="polite">Loading...</div>
+                </div>
+            </div>
+        </section>
+
+        <main class="main-content">
+            <!-- Interactive Map Section -->
+            <section class="map-section" aria-labelledby="map-heading">
+                <h2 id="map-heading" class="section-title">🗺️ Artifact Locations</h2>
+                <div id="map" class="map-container" role="application" aria-label="Interactive map showing artifact locations"></div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="charts-row" aria-labelledby="charts-heading">
+                <h2 id="charts-heading" class="sr-only">Statistical Charts</h2>
+                
+                <div class="chart-section">
+                    <h3 class="section-title">📈 Description Length Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="lengthChart" width="400" height="300" aria-label="Bar chart showing distribution of description lengths"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <h3 class="section-title">📊 Timeline Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="yearChart" width="400" height="300" aria-label="Line chart showing artifact distribution across time periods"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- License Types Section -->
+            <section class="license-section" aria-labelledby="license-heading">
+                <h2 id="license-heading" class="section-title">⚖️ License Types</h2>
+                <div class="license-grid" id="licenseGrid" role="list" aria-label="License types and their frequencies">
+                    <div class="loading">Loading license information...</div>
+                </div>
+            </section>
+
+            <!-- Non-Playable Artifacts Section -->
+            <section class="playability-section" aria-labelledby="playability-heading">
+                <h2 id="playability-heading" class="section-title">🚫 Non-Playable Artifacts</h2>
+                <div class="artifact-list" id="nonPlayableList" role="list" aria-label="List of non-playable artifacts">
+                    <div class="loading">Loading non-playable artifacts...</div>
+                </div>
+            </section>
+
+            <!-- Link Testing Tool -->
+            <section class="test-section" aria-labelledby="test-heading">
+                <h2 id="test-heading" class="section-title">🔧 Link Testing Tool</h2>
+                <div class="test-container">
+                    <p>Test all artifact image and author links for accessibility and validity.</p>
+                    <button id="testLinksBtn" class="test-button" type="button" aria-describedby="test-description">
+                        Test Every Artifact Link
+                    </button>
+                    <p id="test-description" class="sr-only">
+                        This will test all image URLs and author links in your artifact collection to identify any broken links.
+                    </p>
+                    <div id="testProgress" class="test-progress" style="display: none;" aria-live="polite" aria-atomic="true"></div>
+                    <div id="testResults" class="test-results" aria-live="polite" aria-atomic="false"></div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Top/Bottom Lists Section -->
+        <section class="lists-container" aria-labelledby="lists-heading">
+            <h2 id="lists-heading" class="sr-only">Top Artifact Lists</h2>
+            
+            <div class="list-section">
+                <h3 class="section-title">📝 Top 5 Longest Titles</h3>
+                <div class="artifact-list" id="longestTitlesList" role="list" aria-label="Artifacts with the longest titles">
+                    <div class="loading">Loading longest titles...</div>
+                </div>
+            </div>
+
+            <div class="list-section">
+                <h3 class="section-title">📤 Top 5 Shortest Titles</h3>
+                <div class="artifact-list" id="shortestTitlesList" role="list" aria-label="Artifacts with the shortest titles">
+                    <div class="loading">Loading shortest titles...</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="lists-container">
+            <div class="list-section">
+                <h3 class="section-title">🏆 Top 5 Longest Descriptions</h3>
+                <div class="artifact-list" id="longestList" role="list" aria-label="Artifacts with the longest descriptions">
+                    <div class="loading">Loading longest descriptions...</div>
+                </div>
+            </div>
+
+            <div class="list-section">
+                <h3 class="section-title">⚡ Top 5 Shortest Descriptions</h3>
+                <div class="artifact-list" id="shortestList" role="list" aria-label="Artifacts with the shortest descriptions">
+                    <div class="loading">Loading shortest descriptions...</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="lists-container">
+            <div class="list-section">
+                <h3 class="section-title">🖼️ Top 5 Highest Image Quality</h3>
+                <div class="artifact-list" id="highestImageQualityList" role="list" aria-label="Artifacts with the highest image quality">
+                    <div class="loading analysis-loading">
+                        <span>Analyzing image quality...</span>
+                        <span class="analysis-progress" id="highestQualityProgress">0/0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="list-section">
+                <h3 class="section-title">📉 Top 5 Lowest Image Quality</h3>
+                <div class="artifact-list" id="lowestImageQualityList" role="list" aria-label="Artifacts with the lowest image quality">
+                    <div class="loading analysis-loading">
+                        <span>Analyzing image quality...</span>
+                        <span class="analysis-progress" id="lowestQualityProgress">0/0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Complete Artifact Collection -->
+        <section class="all-artifacts-section" aria-labelledby="all-artifacts-heading">
+            <h2 id="all-artifacts-heading" class="section-title">📜 Complete Artifact Collection</h2>
+            
+            <!-- Sorting Controls -->
+            <div class="sorting-controls" role="region" aria-labelledby="sorting-heading">
+                <h3 id="sorting-heading" class="sr-only">Sorting Options</h3>
+                
+                <div class="sorting-group">
+                    <label for="sortBySelect" class="sorting-label">Sort by:</label>
+                    <select id="sortBySelect" class="sorting-select" aria-describedby="sort-description">
+                        <option value="year-newest">Year (Newest First)</option>
+                        <option value="year-oldest">Year (Oldest First)</option>
+                        <option value="title-longest">Title Length (Longest)</option>
+                        <option value="title-shortest">Title Length (Shortest)</option>
+                        <option value="description-longest">Description Length (Longest)</option>
+                        <option value="description-shortest">Description Length (Shortest)</option>
+                        <option value="image-high-quality">Image Quality (Highest)</option>
+                        <option value="image-low-quality">Image Quality (Lowest)</option>
+                        <option value="license-common">License (Most Common)</option>
+                        <option value="license-rare">License (Rarest)</option>
+                        <option value="author-common">Author (Most Common)</option>
+                        <option value="author-rare">Author (Rarest)</option>
+                    </select>
+                    <p id="sort-description" class="sr-only">
+                        Choose how to sort the complete artifact collection below.
+                    </p>
+                </div>
+                
+                <button id="resetSortBtn" class="sort-reset-btn" type="button">
+                    Reset to Default
+                </button>
+                
+                <div class="current-sort-info" id="currentSortInfo" aria-live="polite">
+                    Sorted by: Year (Newest First)
+                </div>
+            </div>
+            
+            <!-- All Artifacts Display -->
+            <div id="allArtifactsList" class="all-artifacts-container" role="list" aria-label="Complete list of artifacts" aria-live="polite">
+                <div class="loading">Loading complete artifact collection...</div>
+            </div>
+            
+            <!-- Load More Button -->
+            <div id="loadMoreBtn" class="load-more-container" style="display: none;">
+                <button class="load-more-button" type="button" aria-describedby="load-more-description">
+                    Load More Artifacts
+                </button>
+                <p id="load-more-description" class="sr-only">
+                    Load additional artifacts to display more items from your collection.
+                </p>
+            </div>
+        </section>
+
+        <!-- Error Message -->
+        <div class="error-message" id="errorMessage" style="display: none;" role="alert" aria-live="assertive">
+            <h3>⚠ Error Loading Data</h3>
+            <p>Could not load artifactlist.json. Please ensure the file is in the same directory as this HTML file and try refreshing the page.</p>
+        </div>
+    </div>
+
+    <!-- Screen Reader Only Styles -->
+    <style>
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+
+    <!-- External Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+            crossorigin=""></script>
+    
+    <!-- Custom Application Script -->
+    <script src="index.js"></script>
+
+    <!-- Performance and Error Monitoring -->
+    <script>
+        // Basic error monitoring
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+        });
+
+        // Performance monitoring
+        window.addEventListener('load', function() {
+            const loadTime = performance.now();
+            console.log(`Dashboard loaded in ${Math.round(loadTime)}ms`);
+        });
+
+        // Service worker registration for offline functionality (optional)
+        if ('serviceWorker' in navigator && location.protocol === 'https:') {
+            navigator.serviceWorker.register('/sw.js').catch(function(err) {
+                console.log('Service Worker registration failed: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
