@@ -282,6 +282,12 @@ header h1 {
 .image-quality-badge.quality-loading {
     background: #888;
     color: white;
+    animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+    from { opacity: 0.6; }
+    to { opacity: 1; }
 }
 
 .artifact-year {
@@ -307,6 +313,7 @@ header h1 {
     font-weight: 600;
     color: var(--light-yellow);
     opacity: 0.8;
+    animation: pulse 1.5s ease-in-out infinite alternate;
 }
 
 .chart-section {
@@ -451,6 +458,140 @@ header h1 {
 
 .error-message p {
     color: var(--light-green);
+}
+
+/* Enhanced Image Quality Section Styles */
+.image-quality-section {
+    margin-bottom: 40px;
+    padding: 0 40px 40px;
+}
+
+.image-quality-controls {
+    margin-bottom: 30px;
+    padding: 25px;
+    background: var(--dark-green);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    border: 2px solid var(--light-green);
+}
+
+.quality-mode-selector {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.quality-mode-label {
+    color: var(--light-green);
+    font-weight: 600;
+    font-size: 1rem;
+    white-space: nowrap;
+}
+
+.quality-mode-select {
+    background: var(--dark-green-hover);
+    color: var(--light-green);
+    border: 2px solid var(--light-green);
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-family: var(--font-family);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    min-width: 280px;
+}
+
+.quality-mode-select:hover {
+    background: rgba(153, 238, 153, 0.1);
+    border-color: var(--light-green-hover);
+}
+
+.quality-mode-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(153, 238, 153, 0.3);
+}
+
+.quality-mode-select option {
+    background: var(--dark-green);
+    color: var(--light-green);
+    padding: 10px;
+}
+
+/* Enhanced Analysis Progress Indicators */
+.analysis-progress-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 12px 18px;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid var(--dark-yellow);
+}
+
+.analysis-progress-icon {
+    font-size: 1.2rem;
+    color: var(--dark-yellow);
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.analysis-progress-text {
+    color: var(--light-yellow);
+    font-weight: 600;
+    font-size: 0.95rem;
+    flex: 1;
+}
+
+.analysis-progress-count {
+    color: var(--dark-yellow);
+    font-weight: 700;
+    font-size: 1rem;
+    background: rgba(255, 215, 0, 0.2);
+    padding: 4px 12px;
+    border-radius: 12px;
+    min-width: 80px;
+    text-align: center;
+}
+
+/* Enhanced Image Quality Display */
+.quality-score-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.quality-metric {
+    background: rgba(153, 238, 153, 0.1);
+    border: 1px solid var(--light-green);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.quality-metric.aspect-ratio {
+    border-color: #4CAF50;
+    color: #4CAF50;
+}
+
+.quality-metric.pixel-size {
+    border-color: #2196F3;
+    color: #2196F3;
+}
+
+.quality-metric.overall {
+    border-color: var(--light-yellow);
+    color: var(--light-yellow);
+    font-weight: 700;
 }
 
 /* Image Modal Styles */
@@ -878,6 +1019,147 @@ header h1 {
     margin-bottom: 20px;
 }
 
+/* Enhanced Quality Metric Displays */
+.quality-breakdown {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.quality-detail {
+    background: rgba(153, 238, 153, 0.1);
+    border: 1px solid rgba(153, 238, 153, 0.3);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.quality-detail.aspect-ratio {
+    border-color: rgba(76, 175, 80, 0.5);
+    color: #4CAF50;
+}
+
+.quality-detail.pixel-size {
+    border-color: rgba(33, 150, 243, 0.5);
+    color: #2196F3;
+}
+
+.quality-detail.overall {
+    border-color: rgba(255, 255, 0, 0.5);
+    color: var(--light-yellow);
+    font-weight: 600;
+}
+
+/* Analysis Status Indicators */
+.analysis-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.analysis-status.analyzing {
+    background: rgba(255, 152, 0, 0.2);
+    color: #FF9800;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.analysis-status.complete {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.analysis-status.error {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.analysis-status-icon {
+    font-size: 0.8rem;
+}
+
+.analysis-status.analyzing .analysis-status-icon {
+    animation: spin 1.5s linear infinite;
+}
+
+/* Enhanced Progress Indicators */
+.progress-ring {
+    width: 20px;
+    height: 20px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.progress-ring-circle {
+    fill: none;
+    stroke: var(--light-green);
+    stroke-width: 2;
+    stroke-linecap: round;
+    transform-origin: 50% 50%;
+    transform: rotate(-90deg);
+    transition: stroke-dasharray 0.3s ease;
+}
+
+.progress-ring-background {
+    fill: none;
+    stroke: rgba(153, 238, 153, 0.2);
+    stroke-width: 2;
+}
+
+/* Quality Mode Specific Styles */
+.quality-mode-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+.quality-mode-indicator.overall-mode {
+    background: rgba(255, 255, 0, 0.1);
+    color: var(--light-yellow);
+    border: 1px solid rgba(255, 255, 0, 0.3);
+}
+
+.quality-mode-indicator.aspect-ratio-mode {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.quality-mode-indicator.pixel-size-mode {
+    background: rgba(33, 150, 243, 0.1);
+    color: #2196F3;
+    border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+/* Enhanced Loading States */
+.loading-shimmer {
+    background: linear-gradient(90deg, 
+        rgba(153, 238, 153, 0.1) 0%, 
+        rgba(153, 238, 153, 0.3) 50%, 
+        rgba(153, 238, 153, 0.1) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite ease-in-out;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
 /* Improved responsive design */
 @media (max-width: 1024px) {
     .charts-row {
@@ -914,6 +1196,20 @@ header h1 {
         text-align: left;
         min-width: auto;
     }
+    
+    .image-quality-controls {
+        padding: 20px;
+    }
+    
+    .quality-mode-selector {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .quality-mode-select {
+        min-width: auto;
+    }
 }
 
 @media (max-width: 768px) {
@@ -933,7 +1229,7 @@ header h1 {
         font-size: 2rem;
     }
     
-    .main-content, .all-artifacts-section {
+    .main-content, .all-artifacts-section, .image-quality-section {
         padding: 0 20px 30px;
     }
     
@@ -1053,6 +1349,20 @@ header h1 {
     .modal-image {
         max-height: 70vh;
     }
+    
+    .quality-breakdown {
+        justify-content: center;
+    }
+    
+    .analysis-progress-container {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+    
+    .analysis-progress-count {
+        align-self: center;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1087,5 +1397,23 @@ header h1 {
         width: 35px;
         height: 35px;
         font-size: 1.5rem;
+    }
+    
+    .quality-mode-label {
+        font-size: 0.9rem;
+    }
+    
+    .quality-mode-select {
+        font-size: 0.85rem;
+        min-width: auto;
+    }
+    
+    .quality-breakdown {
+        gap: 4px;
+    }
+    
+    .quality-detail {
+        font-size: 0.65rem;
+        padding: 2px 4px;
     }
 }

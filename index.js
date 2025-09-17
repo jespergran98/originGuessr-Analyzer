@@ -20,6 +20,9 @@ class ArtifactAnalyzer {
         this.imageAnalysisProgress = { current: 0, total: 0 };
         this.imageModal = null;
         
+        // Enhanced image quality tracking
+        this.imageQualityMode = 'overall'; // 'overall', 'aspect-ratio', 'pixel-size'
+        
         // Track which artifacts have been analyzed
         this.analyzedArtifacts = new Set();
         this.priorityArtifacts = new Set();
@@ -31,6 +34,7 @@ class ArtifactAnalyzer {
         this.handleLinkTest = this.handleLinkTest.bind(this);
         this.handleImageClick = this.handleImageClick.bind(this);
         this.handleModalClose = this.handleModalClose.bind(this);
+        this.handleImageQualityModeChange = this.handleImageQualityModeChange.bind(this);
         
         this.init();
     }
@@ -160,8 +164,14 @@ class ArtifactAnalyzer {
             artifact.id = artifact.id || `artifact_${index}`;
             artifact.descriptionLength = this.getStringLength(artifact.description);
             artifact.titleLength = this.getStringLength(artifact.title);
-            artifact.imageQuality = null; // Will be calculated asynchronously
+            
+            // Enhanced image quality properties
+            artifact.imageQuality = null;
             artifact.imageQualityScore = 0;
+            artifact.aspectRatioScore = 0;
+            artifact.pixelSizeScore = 0;
+            artifact.aspectRatio = null;
+            artifact.pixelSize = null;
             
             // Validate and normalize data
             if (typeof artifact.year === 'string') {
@@ -208,20 +218,40 @@ class ArtifactAnalyzer {
             }
         }
         
-        // Add top 5 artifacts for each quality list
-        const highQualityArtifacts = [...this.artifacts]
-            .filter(a => a.imageQualityScore > 0)
-            .sort((a, b) => b.imageQualityScore - a.imageQualityScore)
-            .slice(0, 5);
-            
-        const lowQualityArtifacts = [...this.artifacts]
-            .filter(a => a.imageQualityScore > 0)
-            .sort((a, b) => a.imageQualityScore - b.imageQualityScore)
-            .slice(0, 5);
-            
-        [...highQualityArtifacts, ...lowQualityArtifacts].forEach(artifact => {
-            this.priorityArtifacts.add(artifact.id);
+        // Add top artifacts for each quality metric
+        const modes = ['overall', 'aspect-ratio', 'pixel-size'];
+        modes.forEach(mode => {
+            const topArtifacts = this.getTopArtifactsByMode(mode, 5);
+            const bottomArtifacts = this.getBottomArtifactsByMode(mode, 5);
+            [...topArtifacts, ...bottomArtifacts].forEach(artifact => {
+                this.priorityArtifacts.add(artifact.id);
+            });
         });
+    }
+
+    getTopArtifactsByMode(mode, count) {
+        const validArtifacts = this.artifacts.filter(a => this.getScoreByMode(a, mode) > 0);
+        return validArtifacts
+            .sort((a, b) => this.getScoreByMode(b, mode) - this.getScoreByMode(a, mode))
+            .slice(0, count);
+    }
+
+    getBottomArtifactsByMode(mode, count) {
+        const validArtifacts = this.artifacts.filter(a => this.getScoreByMode(a, mode) > 0);
+        return validArtifacts
+            .sort((a, b) => this.getScoreByMode(a, mode) - this.getScoreByMode(b, mode))
+            .slice(0, count);
+    }
+
+    getScoreByMode(artifact, mode) {
+        switch (mode) {
+            case 'aspect-ratio':
+                return artifact.aspectRatioScore;
+            case 'pixel-size':
+                return artifact.pixelSizeScore;
+            default:
+                return artifact.imageQualityScore;
+        }
     }
 
     async startImageQualityAnalysis() {
@@ -360,13 +390,8 @@ class ArtifactAnalyzer {
         
         if (analyzedArtifacts.length === 0) return;
         
-        const highestQuality = [...analyzedArtifacts]
-            .sort((a, b) => b.imageQualityScore - a.imageQualityScore)
-            .slice(0, 5);
-            
-        const lowestQuality = [...analyzedArtifacts]
-            .sort((a, b) => a.imageQualityScore - b.imageQualityScore)
-            .slice(0, 5);
+        const highestQuality = this.getTopArtifactsByMode(this.imageQualityMode, 5);
+        const lowestQuality = this.getBottomArtifactsByMode(this.imageQualityMode, 5);
         
         this.displayArtifactList('highestImageQualityList', highestQuality, 'imageQuality');
         this.displayArtifactList('lowestImageQualityList', lowestQuality, 'imageQuality');
@@ -382,14 +407,14 @@ class ArtifactAnalyzer {
                 if (artifact && artifact.imageQualityScore > 0) {
                     const qualityElement = card.querySelector('.meta-row:last-child span:last-child');
                     if (qualityElement && qualityElement.textContent.includes('Analyzing...')) {
-                        qualityElement.textContent = `Image Quality: ${artifact.imageQualityScore}/100 (${artifact.imageQuality})`;
+                        qualityElement.textContent = `Overall: ${artifact.imageQualityScore}/100, AR: ${artifact.aspectRatioScore}/100, Pixels: ${artifact.pixelSizeScore}/100`;
                     }
                     
                     // Update the badge
                     const badge = card.querySelector('.image-quality-badge');
                     if (badge && badge.classList.contains('quality-loading')) {
                         badge.className = `image-quality-badge ${this.getQualityClass(artifact.imageQualityScore)}`;
-                        badge.textContent = `🖼️Quality: ${artifact.imageQualityScore}/100`;
+                        badge.textContent = `Quality: ${artifact.imageQualityScore}/100`;
                     }
                 }
             }
@@ -406,39 +431,54 @@ class ArtifactAnalyzer {
         if (!artifact.image) {
             artifact.imageQualityScore = 0;
             artifact.imageQuality = 'No Image';
+            artifact.aspectRatioScore = 0;
+            artifact.pixelSizeScore = 0;
             return;
         }
 
         if (this.imageQualityCache.has(artifact.image)) {
             const cached = this.imageQualityCache.get(artifact.image);
-            artifact.imageQualityScore = cached.score;
+            artifact.imageQualityScore = cached.overallScore;
             artifact.imageQuality = cached.quality;
+            artifact.aspectRatioScore = cached.aspectRatioScore;
+            artifact.pixelSizeScore = cached.pixelSizeScore;
+            artifact.aspectRatio = cached.aspectRatio;
+            artifact.pixelSize = cached.pixelSize;
             return;
         }
 
         try {
             const imageData = await this.loadImageData(artifact.image);
-            const score = this.calculateQualityScore(imageData);
+            const scores = this.calculateEnhancedQualityScores(imageData);
             
-            artifact.imageQualityScore = score;
-            artifact.imageQuality = this.getQualityLabel(score);
+            artifact.imageQualityScore = scores.overall;
+            artifact.imageQuality = this.getQualityLabel(scores.overall);
+            artifact.aspectRatioScore = scores.aspectRatio;
+            artifact.pixelSizeScore = scores.pixelSize;
+            artifact.aspectRatio = imageData.aspectRatio;
+            artifact.pixelSize = imageData.pixelCount;
             
             // Cache the result
             this.imageQualityCache.set(artifact.image, {
-                score: score,
-                quality: artifact.imageQuality
+                overallScore: scores.overall,
+                quality: artifact.imageQuality,
+                aspectRatioScore: scores.aspectRatio,
+                pixelSizeScore: scores.pixelSize,
+                aspectRatio: imageData.aspectRatio,
+                pixelSize: imageData.pixelCount
             });
         } catch (error) {
             console.warn(`Failed to analyze image quality for ${artifact.title}:`, error);
             artifact.imageQualityScore = 0;
             artifact.imageQuality = 'Analysis Failed';
+            artifact.aspectRatioScore = 0;
+            artifact.pixelSizeScore = 0;
         }
     }
 
     loadImageData(imageUrl, timeout = 8000) {
         return new Promise((resolve, reject) => {
             const img = new Image();
-            const startTime = Date.now();
             
             // Set up timeout
             const timeoutId = setTimeout(() => {
@@ -447,12 +487,15 @@ class ArtifactAnalyzer {
             
             img.onload = () => {
                 clearTimeout(timeoutId);
-                const loadTime = Date.now() - startTime;
+                const aspectRatio = img.naturalWidth / img.naturalHeight;
+                const pixelCount = img.naturalWidth * img.naturalHeight;
+                
                 resolve({
                     width: img.naturalWidth,
                     height: img.naturalHeight,
-                    loadTime: loadTime,
-                    url: imageUrl
+                    url: imageUrl,
+                    aspectRatio: aspectRatio,
+                    pixelCount: pixelCount
                 });
             };
             
@@ -465,84 +508,124 @@ class ArtifactAnalyzer {
         });
     }
 
-    calculateQualityScore(imageData) {
-        const { width, height, loadTime, url } = imageData;
+    calculateEnhancedQualityScores(imageData) {
+        const { width, height, aspectRatio, pixelCount } = imageData;
         
-        // Base score from resolution
-        const pixelCount = width * height;
-        let score = 0;
+        // Aspect Ratio Score (0-50) - Prioritize 4:3 to 16:9 ratios
+        let aspectRatioScore = 0;
+        if (aspectRatio >= 1.33 && aspectRatio <= 1.78) { // 4:3 to 16:9 - ideal range
+            aspectRatioScore = 50;
+        } else if (aspectRatio >= 1.25 && aspectRatio < 1.33) { // 5:4 to 4:3
+            aspectRatioScore = 48 - ((1.33 - aspectRatio) / 0.08) * 3;
+        } else if (aspectRatio > 1.78 && aspectRatio <= 2.0) { // 16:9 to 2:1
+            aspectRatioScore = 48 - ((aspectRatio - 1.78) / 0.22) * 3;
+        } else if (aspectRatio >= 1.0 && aspectRatio < 1.25) { // 1:1 to 5:4
+            aspectRatioScore = 45 - ((1.25 - aspectRatio) / 0.25) * 10;
+        } else if (aspectRatio > 2.0 && aspectRatio <= 2.4) { // 2:1 to 2.4:1
+            aspectRatioScore = 45 - ((aspectRatio - 2.0) / 0.4) * 10;
+        } else if (aspectRatio >= 0.8 && aspectRatio < 1.0) { // 4:5 to 1:1
+            aspectRatioScore = 35 - ((1.0 - aspectRatio) / 0.2) * 10;
+        } else if (aspectRatio > 2.4 && aspectRatio <= 3.0) { // 2.4:1 to 3:1
+            aspectRatioScore = 35 - ((aspectRatio - 2.4) / 0.6) * 10;
+        } else if (aspectRatio >= 0.6 && aspectRatio < 0.8) { // 3:5 to 4:5
+            aspectRatioScore = 25 - ((0.8 - aspectRatio) / 0.2) * 8;
+        } else if (aspectRatio > 3.0 && aspectRatio <= 4.0) { // 3:1 to 4:1
+            aspectRatioScore = 25 - ((aspectRatio - 3.0) / 1.0) * 8;
+        } else if (aspectRatio >= 0.4 && aspectRatio < 0.6) { // 2:5 to 3:5
+            aspectRatioScore = 17 - ((0.6 - aspectRatio) / 0.2) * 5;
+        } else if (aspectRatio > 4.0 && aspectRatio <= 5.0) { // 4:1 to 5:1
+            aspectRatioScore = 17 - ((aspectRatio - 4.0) / 1.0) * 5;
+        } else if (aspectRatio >= 0.25 && aspectRatio < 0.4) { // 1:4 to 2:5
+            aspectRatioScore = 12 - ((0.4 - aspectRatio) / 0.15) * 4;
+        } else if (aspectRatio > 5.0 && aspectRatio <= 6.0) { // 5:1 to 6:1
+            aspectRatioScore = 12 - ((aspectRatio - 5.0) / 1.0) * 4;
+        } else if (aspectRatio >= 0.15 && aspectRatio < 0.25) { // 3:20 to 1:4
+            aspectRatioScore = 8 - ((0.25 - aspectRatio) / 0.1) * 3;
+        } else if (aspectRatio > 6.0 && aspectRatio <= 8.0) { // 6:1 to 8:1
+            aspectRatioScore = 8 - ((aspectRatio - 6.0) / 2.0) * 3;
+        } else { // Extreme ratios
+            aspectRatioScore = Math.max(0, 5 - Math.abs(Math.log(aspectRatio / 1.5)) * 2);
+        }
+        aspectRatioScore = Math.max(0, Math.min(50, Math.round(aspectRatioScore)));
         
-        // Resolution scoring (0-60 points)
-        if (pixelCount >= 2073600) { // 1920x1080 or higher
-            score += 60;
-        } else if (pixelCount >= 921600) { // 1280x720
-            score += 50;
+        // Pixel Size Score (0-50) - Higher pixel count is better, with more granular scoring
+        let pixelSizeScore = 0;
+        if (pixelCount >= 16777216) { // 4K+ (4096x4096)
+            pixelSizeScore = 50;
+        } else if (pixelCount >= 8294400) { // 4K (3840x2160)
+            pixelSizeScore = 49 - ((16777216 - pixelCount) / 8482816) * 1;
+        } else if (pixelCount >= 6220800) { // 2880x2160
+            pixelSizeScore = 48 - ((8294400 - pixelCount) / 2073600) * 1;
+        } else if (pixelCount >= 4953600) { // 2560x1936
+            pixelSizeScore = 47 - ((6220800 - pixelCount) / 1267200) * 1;
+        } else if (pixelCount >= 3686400) { // 2048x1800
+            pixelSizeScore = 46 - ((4953600 - pixelCount) / 1267200) * 1;
+        } else if (pixelCount >= 2764800) { // 1920x1440
+            pixelSizeScore = 45 - ((3686400 - pixelCount) / 921600) * 1;
+        } else if (pixelCount >= 2073600) { // 1920x1080 - Full HD
+            pixelSizeScore = 44 - ((2764800 - pixelCount) / 691200) * 1;
+        } else if (pixelCount >= 1638400) { // 1600x1024
+            pixelSizeScore = 42 - ((2073600 - pixelCount) / 435200) * 2;
+        } else if (pixelCount >= 1382400) { // 1280x1080
+            pixelSizeScore = 40 - ((1638400 - pixelCount) / 256000) * 2;
+        } else if (pixelCount >= 1228800) { // 1440x853
+            pixelSizeScore = 38 - ((1382400 - pixelCount) / 153600) * 2;
+        } else if (pixelCount >= 1024000) { // 1280x800
+            pixelSizeScore = 36 - ((1228800 - pixelCount) / 204800) * 2;
+        } else if (pixelCount >= 921600) { // 1280x720 - HD
+            pixelSizeScore = 34 - ((1024000 - pixelCount) / 102400) * 2;
+        } else if (pixelCount >= 768000) { // 1024x750
+            pixelSizeScore = 32 - ((921600 - pixelCount) / 153600) * 2;
+        } else if (pixelCount >= 614400) { // 1024x600
+            pixelSizeScore = 30 - ((768000 - pixelCount) / 153600) * 2;
+        } else if (pixelCount >= 518400) { // 960x540
+            pixelSizeScore = 28 - ((614400 - pixelCount) / 96000) * 2;
         } else if (pixelCount >= 480000) { // 800x600
-            score += 40;
+            pixelSizeScore = 26 - ((518400 - pixelCount) / 38400) * 2;
+        } else if (pixelCount >= 409600) { // 800x512
+            pixelSizeScore = 24 - ((480000 - pixelCount) / 70400) * 2;
+        } else if (pixelCount >= 345600) { // 720x480
+            pixelSizeScore = 22 - ((409600 - pixelCount) / 64000) * 2;
+        } else if (pixelCount >= 307200) { // 640x480 - VGA
+            pixelSizeScore = 20 - ((345600 - pixelCount) / 38400) * 2;
+        } else if (pixelCount >= 256000) { // 640x400
+            pixelSizeScore = 18 - ((307200 - pixelCount) / 51200) * 2;
         } else if (pixelCount >= 230400) { // 640x360
-            score += 30;
+            pixelSizeScore = 16 - ((256000 - pixelCount) / 25600) * 2;
+        } else if (pixelCount >= 192000) { // 640x300
+            pixelSizeScore = 14 - ((230400 - pixelCount) / 38400) * 2;
+        } else if (pixelCount >= 153600) { // 480x320
+            pixelSizeScore = 12 - ((192000 - pixelCount) / 38400) * 2;
+        } else if (pixelCount >= 120000) { // 400x300
+            pixelSizeScore = 10 - ((153600 - pixelCount) / 33600) * 2;
         } else if (pixelCount >= 76800) { // 320x240
-            score += 20;
+            pixelSizeScore = 8 - ((120000 - pixelCount) / 43200) * 2;
+        } else if (pixelCount >= 50000) { // 250x200
+            pixelSizeScore = 6 - ((76800 - pixelCount) / 26800) * 2;
+        } else if (pixelCount >= 32400) { // 180x180
+            pixelSizeScore = 4 - ((50000 - pixelCount) / 17600) * 2;
+        } else if (pixelCount >= 16000) { // 160x100
+            pixelSizeScore = 2 - ((32400 - pixelCount) / 16400) * 2;
         } else {
-            score += 10;
+            pixelSizeScore = Math.max(0, 1 - ((16000 - pixelCount) / 16000));
         }
+        pixelSizeScore = Math.max(0, Math.min(50, Math.round(pixelSizeScore)));
         
-        // Aspect ratio scoring (0-10 points)
-        const aspectRatio = width / height;
-        if (aspectRatio >= 0.8 && aspectRatio <= 1.25) {
-            score += 10; // Good aspect ratio
-        } else if (aspectRatio >= 0.5 && aspectRatio <= 2.0) {
-            score += 8; // Acceptable aspect ratio
-        } else {
-            score += 5; // Poor aspect ratio
-        }
+        // Overall Score - Simple sum of the two components (max 100)
+        const overallScore = aspectRatioScore + pixelSizeScore;
         
-        // Load time scoring (0-15 points) - faster loading suggests better optimization
-        if (loadTime < 500) {
-            score += 15;
-        } else if (loadTime < 1000) {
-            score += 12;
-        } else if (loadTime < 2000) {
-            score += 10;
-        } else if (loadTime < 5000) {
-            score += 8;
-        } else {
-            score += 5;
-        }
-        
-        // File format bonus (0-10 points)
-        const urlLower = url.toLowerCase();
-        if (urlLower.includes('.webp')) {
-            score += 10; // Modern format
-        } else if (urlLower.includes('.png')) {
-            score += 8; // Good for graphics
-        } else if (urlLower.includes('.jpg') || urlLower.includes('.jpeg')) {
-            score += 7; // Good for photos
-        } else if (urlLower.includes('.svg')) {
-            score += 9; // Vector graphics
-        } else {
-            score += 5; // Other formats
-        }
-        
-        // Size bonus (0-5 points) - larger images generally better
-        if (Math.min(width, height) >= 1000) {
-            score += 5;
-        } else if (Math.min(width, height) >= 500) {
-            score += 4;
-        } else if (Math.min(width, height) >= 300) {
-            score += 3;
-        } else {
-            score += 2;
-        }
-        
-        return Math.min(100, Math.max(0, score));
+        return {
+            overall: Math.max(0, Math.min(100, overallScore)),
+            aspectRatio: Math.round(aspectRatioScore),
+            pixelSize: Math.round(pixelSizeScore)
+        };
     }
 
     getQualityLabel(score) {
-        if (score >= 80) return 'Excellent';
-        if (score >= 65) return 'Good';
-        if (score >= 45) return 'Average';
-        if (score >= 25) return 'Poor';
+        if (score >= 85) return 'Excellent';
+        if (score >= 70) return 'Good';
+        if (score >= 50) return 'Average';
+        if (score >= 30) return 'Poor';
         return 'Very Poor';
     }
 
@@ -555,6 +638,32 @@ class ArtifactAnalyzer {
             this.averageImageQuality = validScores.reduce((sum, score) => sum + score, 0) / validScores.length;
         } else {
             this.averageImageQuality = 0;
+        }
+    }
+
+    handleImageQualityModeChange(e) {
+        this.imageQualityMode = e.target.value;
+        this.updateImageQualityListsProgressive();
+        this.updateImageQualityHeaders();
+    }
+
+    updateImageQualityHeaders() {
+        const highestHeader = document.querySelector('#highestImageQualitySection .section-title');
+        const lowestHeader = document.querySelector('#lowestImageQualitySection .section-title');
+        
+        const modeNames = {
+            'overall': 'Overall Quality',
+            'aspect-ratio': 'Aspect Ratio',
+            'pixel-size': 'Pixel Size'
+        };
+        
+        const currentModeName = modeNames[this.imageQualityMode];
+        
+        if (highestHeader) {
+            highestHeader.textContent = `Top 5 Highest ${currentModeName}`;
+        }
+        if (lowestHeader) {
+            lowestHeader.textContent = `Top 5 Lowest ${currentModeName}`;
         }
     }
 
@@ -729,10 +838,11 @@ class ArtifactAnalyzer {
 
         if (artifacts.length === 0) {
             if (type === 'imageQuality') {
+                const progressId = containerId === 'highestImageQualityList' ? 'highestQualityProgress' : 'lowestQualityProgress';
                 container.innerHTML = `
                     <div class="loading analysis-loading">
                         <span>Analyzing image quality...</span>
-                        <span class="analysis-progress" id="${containerId === 'highestImageQualityList' ? 'highestQualityProgress' : 'lowestQualityProgress'}">0/${this.artifacts.length}</span>
+                        <span class="analysis-progress" id="${progressId}">0/${this.artifacts.length}</span>
                     </div>
                 `;
             } else {
@@ -806,25 +916,54 @@ class ArtifactAnalyzer {
     }
 
     createImageQualityDisplay(artifact, rank) {
+        let qualityText = '';
+        
+        switch (this.imageQualityMode) {
+            case 'aspect-ratio':
+                const ratioText = artifact.aspectRatio ? artifact.aspectRatio.toFixed(2) : 'N/A';
+                qualityText = `Aspect Ratio: ${ratioText} (Score: ${artifact.aspectRatioScore}/100)`;
+                break;
+            case 'pixel-size':
+                const pixelText = artifact.pixelSize ? artifact.pixelSize.toLocaleString() : 'N/A';
+                qualityText = `Pixels: ${pixelText} (Score: ${artifact.pixelSizeScore}/100)`;
+                break;
+            default:
+                qualityText = `Overall Quality: ${artifact.imageQualityScore}/100 (${artifact.imageQuality})`;
+        }
+        
         return `
             <div class="artifact-title">#${rank}. ${this.escapeHtml(artifact.title)}</div>
-            <div class="artifact-description-full">Quality Score: ${artifact.imageQualityScore}/100 (${artifact.imageQuality})</div>
+            <div class="artifact-description-full">${qualityText}</div>
         `;
     }
 
     createImageQualityBadge(artifact) {
         if (!artifact.imageQuality || artifact.imageQualityScore === 0) {
-            return '<span class="image-quality-badge quality-loading">🖼️Analyzing...</span>';
+            return '<span class="image-quality-badge quality-loading">Analyzing...</span>';
         }
         
-        let qualityClass = 'quality-medium';
-        if (artifact.imageQualityScore >= 80) {
+        let score, qualityClass;
+        
+        switch (this.imageQualityMode) {
+            case 'aspect-ratio':
+                score = artifact.aspectRatioScore;
+                break;
+            case 'pixel-size':
+                score = artifact.pixelSizeScore;
+                break;
+            default:
+                score = artifact.imageQualityScore;
+        }
+        
+        if (score >= 80) {
             qualityClass = 'quality-high';
-        } else if (artifact.imageQualityScore < 45) {
+        } else if (score >= 45) {
+            qualityClass = 'quality-medium';
+        } else {
             qualityClass = 'quality-low';
         }
         
-        return `<span class="image-quality-badge ${qualityClass}">🖼️Quality: ${artifact.imageQualityScore}/100</span>`;
+        return `<span class="image-quality-badge ${qualityClass}">${score}/100</span>`;
     }
 
     setupEventListeners() {
@@ -832,6 +971,14 @@ class ArtifactAnalyzer {
         this.setupInfiniteScroll();
         this.setupLinkTesting();
         this.setupKeyboardNavigation();
+        this.setupImageQualityModeSelector();
+    }
+
+    setupImageQualityModeSelector() {
+        const modeSelector = document.getElementById('imageQualityModeSelect');
+        if (modeSelector) {
+            modeSelector.addEventListener('change', this.handleImageQualityModeChange);
+        }
     }
 
     setupSortingControls() {
@@ -908,13 +1055,11 @@ class ArtifactAnalyzer {
 
             case 'image-high-quality':
                 return [...this.artifacts].sort((a, b) => {
-                    // Sort by image quality score, highest first
                     return b.imageQualityScore - a.imageQualityScore;
                 });
 
             case 'image-low-quality':
                 return [...this.artifacts].sort((a, b) => {
-                    // Sort by image quality score, lowest first (but exclude 0 scores)
                     const scoreA = a.imageQualityScore || 999;
                     const scoreB = b.imageQualityScore || 999;
                     return scoreA - scoreB;
@@ -957,7 +1102,6 @@ class ArtifactAnalyzer {
                 return rareFirst ? freqA - freqB : freqB - freqA;
             }
             
-            // Secondary sort by title for consistency
             return (a.title || '').localeCompare(b.title || '');
         });
     }
@@ -978,7 +1122,6 @@ class ArtifactAnalyzer {
                 return rareFirst ? freqA - freqB : freqB - freqA;
             }
             
-            // Secondary sort by title for consistency
             return (a.title || '').localeCompare(b.title || '');
         });
     }
@@ -1014,7 +1157,6 @@ class ArtifactAnalyzer {
             button.addEventListener('click', this.handleLoadMore);
         }
 
-        // Optional: Auto-load when scrolling near bottom
         const throttledScrollHandler = this.throttle(() => {
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000) {
                 if (this.displayedArtifacts < this.sortedArtifacts.length && 
@@ -1047,7 +1189,6 @@ class ArtifactAnalyzer {
             return;
         }
 
-        // Clear loading message on first load
         if (this.displayedArtifacts === 0 && container.querySelector('.loading')) {
             container.innerHTML = '';
         }
@@ -1058,12 +1199,10 @@ class ArtifactAnalyzer {
         );
         const artifactsToShow = this.sortedArtifacts.slice(this.displayedArtifacts, endIndex);
 
-        // Update priority artifacts to include newly visible ones
         artifactsToShow.forEach(artifact => {
             this.priorityArtifacts.add(artifact.id);
         });
 
-        // Use document fragment for better performance
         const fragment = document.createDocumentFragment();
         artifactsToShow.forEach(artifact => {
             const artifactCard = this.createFullArtifactCard(artifact);
@@ -1073,7 +1212,6 @@ class ArtifactAnalyzer {
 
         this.displayedArtifacts = endIndex;
 
-        // Show/hide load more button
         if (loadMoreBtn) {
             if (this.displayedArtifacts >= this.sortedArtifacts.length) {
                 loadMoreBtn.style.display = 'none';
@@ -1136,7 +1274,7 @@ class ArtifactAnalyzer {
                     </div>
                     <div class="meta-row">
                         <span class="meta-icon" aria-hidden="true">🖼️</span>
-                        <span>Image Quality: ${artifact.imageQualityScore > 0 ? `${artifact.imageQualityScore}/100 (${artifact.imageQuality})` : 'Analyzing...'}</span>
+                        <span>${artifact.imageQualityScore > 0 ? `Overall: ${artifact.imageQualityScore}/100, AR: ${artifact.aspectRatioScore}/100, Pixels: ${artifact.pixelSizeScore}/100` : 'Analyzing...'}</span>
                     </div>
                 </div>
                 <div class="artifact-mini-map" id="miniMap-${this.generateSafeId(artifact)}">
@@ -1145,13 +1283,11 @@ class ArtifactAnalyzer {
             </div>
         `;
 
-        // Add click event listener to the main image
         const mainImg = card.querySelector('.artifact-main-image');
         if (mainImg) {
             mainImg.addEventListener('click', this.handleImageClick);
         }
 
-        // Initialize mini-map if coordinates are available
         if (artifact.lat && artifact.lng && this.isValidCoordinates(artifact.lat, artifact.lng)) {
             setTimeout(() => {
                 this.initMiniMap(artifact, `miniMap-${this.generateSafeId(artifact)}`);
@@ -1235,7 +1371,6 @@ class ArtifactAnalyzer {
                 })
             }).addTo(miniMap);
 
-            // Make mini-map clickable to focus main map
             container.style.cursor = 'pointer';
             container.addEventListener('click', () => {
                 if (this.map) {
@@ -1244,7 +1379,6 @@ class ArtifactAnalyzer {
                 }
             });
 
-            // Add keyboard accessibility
             container.setAttribute('tabindex', '0');
             container.setAttribute('role', 'button');
             container.setAttribute('aria-label', `View ${artifact.title} location on main map`);
@@ -1267,16 +1401,13 @@ class ArtifactAnalyzer {
 
     initMap() {
         try {
-            // Initialize Leaflet map
             this.map = L.map('map').setView([30, 0], 2);
 
-            // Add tile layer with error handling
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
                 attribution: '&copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
                 maxZoom: 18
             }).addTo(this.map);
 
-            // Add markers for artifacts with valid coordinates
             const validArtifacts = this.artifacts.filter(artifact => 
                 this.isValidCoordinates(artifact.lat, artifact.lng)
             );
@@ -1309,7 +1440,6 @@ class ArtifactAnalyzer {
                     className: 'custom-popup'
                 });
 
-                // Add click event to popup images when they're created
                 marker.on('popupopen', () => {
                     const popupImg = document.querySelector('.leaflet-popup .popup-image');
                     if (popupImg) {
@@ -1341,7 +1471,6 @@ class ArtifactAnalyzer {
         if (!ctx) return;
 
         try {
-            // Destroy existing chart if it exists
             if (this.chartInstances.lengthChart) {
                 this.chartInstances.lengthChart.destroy();
             }
@@ -1422,7 +1551,6 @@ class ArtifactAnalyzer {
         if (!ctx) return;
 
         try {
-            // Destroy existing chart if it exists
             if (this.chartInstances.yearChart) {
                 this.chartInstances.yearChart.destroy();
             }
@@ -1430,7 +1558,6 @@ class ArtifactAnalyzer {
             const timeframeCounts = new Array(this.timeframeBoundaries.length - 1).fill(0);
             const timeframeLabels = [];
             
-            // Create labels for timeframes
             for (let i = 0; i < this.timeframeBoundaries.length - 1; i++) {
                 const start = this.timeframeBoundaries[i];
                 const end = this.timeframeBoundaries[i + 1];
@@ -1447,7 +1574,6 @@ class ArtifactAnalyzer {
                 timeframeLabels.push(label);
             }
 
-            // Count artifacts in each timeframe
             this.artifacts.forEach(artifact => {
                 if (artifact.year !== null && artifact.year !== undefined && !isNaN(artifact.year)) {
                     for (let i = 0; i < this.timeframeBoundaries.length - 1; i++) {
@@ -1537,12 +1663,11 @@ class ArtifactAnalyzer {
         testResults.innerHTML = '';
 
         const brokenLinks = [];
-        const totalTests = this.artifacts.length * 2; // Image + author link for each
+        const totalTests = this.artifacts.length * 2;
         let completed = 0;
 
         try {
             for (const artifact of this.artifacts) {
-                // Test image URL
                 if (artifact.image) {
                     try {
                         const imageResponse = await this.testUrl(artifact.image);
@@ -1567,7 +1692,6 @@ class ArtifactAnalyzer {
                 completed++;
                 testProgress.textContent = `Testing links... ${completed}/${totalTests} (${Math.round(completed/totalTests*100)}%)`;
 
-                // Test author link if it exists
                 if (artifact.authorLink && this.isValidUrl(artifact.authorLink)) {
                     try {
                         const authorResponse = await this.testUrl(artifact.authorLink);
@@ -1592,11 +1716,9 @@ class ArtifactAnalyzer {
                 completed++;
                 testProgress.textContent = `Testing links... ${completed}/${totalTests} (${Math.round(completed/totalTests*100)}%)`;
 
-                // Small delay to prevent overwhelming the servers
                 await this.delay(50);
             }
 
-            // Display results
             this.displayTestResults(brokenLinks, totalTests, testProgress, testResults);
 
         } catch (error) {
@@ -1620,14 +1742,14 @@ class ArtifactAnalyzer {
         if (brokenLinks.length === 0) {
             testResults.innerHTML = `
                 <div class="success-message">
-                    <strong>✅ All Links Working!</strong><br>
+                    <strong>All Links Working!</strong><br>
                     All ${totalTests} links tested successfully.
                 </div>
             `;
         } else {
             testResults.innerHTML = `
                 <div style="background: rgba(255, 100, 100, 0.2); border: 2px solid #ff4444; border-radius: 10px; padding: 20px; margin-bottom: 20px; text-align: center;">
-                    <strong>⚠️ Found ${brokenLinks.length} broken link${brokenLinks.length !== 1 ? 's' : ''}</strong>
+                    <strong>Found ${brokenLinks.length} broken link${brokenLinks.length !== 1 ? 's' : ''}</strong>
                 </div>
             `;
 
@@ -1649,13 +1771,11 @@ class ArtifactAnalyzer {
         const timeoutId = setTimeout(() => controller.abort(), timeout);
 
         try {
-            // For images, try to load them as images first
             if (this.isImageUrl(url)) {
                 clearTimeout(timeoutId);
                 return await this.testImageUrl(url, timeout);
             }
 
-            // For other URLs, try fetch with no-cors
             const response = await fetch(url, {
                 method: 'HEAD',
                 signal: controller.signal,
@@ -1700,14 +1820,11 @@ class ArtifactAnalyzer {
     }
 
     setupKeyboardNavigation() {
-        // Add keyboard navigation for interactive elements
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                // Close any open popups
                 if (this.map) {
                     this.map.closePopup();
                 }
-                // Close image modal
                 if (this.imageModal && this.imageModal.style.display !== 'none') {
                     this.handleModalClose();
                 }
@@ -1755,7 +1872,6 @@ class ArtifactAnalyzer {
             errorMessage.style.display = 'block';
         }
 
-        // Update all displays to show error state
         const errorElements = [
             'totalCount', 'avgTitleLength', 'avgLength', 'avgImageQuality',
             'uniqueLicenses', 'yearRange', 'playableCount', 'nonPlayableCount'
@@ -1784,24 +1900,19 @@ class ArtifactAnalyzer {
         });
     }
 
-    // Public method to destroy the analyzer and clean up resources
     destroy() {
-        // Destroy chart instances
         Object.values(this.chartInstances).forEach(chart => {
             if (chart && typeof chart.destroy === 'function') {
                 chart.destroy();
             }
         });
 
-        // Destroy map
         if (this.map) {
             this.map.remove();
         }
 
-        // Remove event listeners
         window.removeEventListener('scroll', this.handleScroll);
         
-        // Clear references
         this.artifacts = [];
         this.map = null;
         this.chartInstances = {};
@@ -1811,7 +1922,6 @@ class ArtifactAnalyzer {
 
 // Initialize the analyzer when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if required dependencies are loaded
     if (typeof L === 'undefined') {
         console.error('Leaflet library not loaded');
         return;
@@ -1822,11 +1932,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Initialize the analyzer
     window.artifactAnalyzer = new ArtifactAnalyzer();
 });
 
-// Handle page unload cleanup
 window.addEventListener('beforeunload', () => {
     if (window.artifactAnalyzer && typeof window.artifactAnalyzer.destroy === 'function') {
         window.artifactAnalyzer.destroy();

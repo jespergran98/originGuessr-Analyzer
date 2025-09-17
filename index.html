@@ -174,7 +174,7 @@
             <h2 id="lists-heading" class="sr-only">Top Artifact Lists</h2>
             
             <div class="list-section">
-                <h3 class="section-title">📝 Top 5 Longest Titles</h3>
+                <h3 class="section-title">📏 Top 5 Longest Titles</h3>
                 <div class="artifact-list" id="longestTitlesList" role="list" aria-label="Artifacts with the longest titles">
                     <div class="loading">Loading longest titles...</div>
                 </div>
@@ -204,23 +204,43 @@
             </div>
         </section>
 
-        <section class="lists-container">
-            <div class="list-section">
-                <h3 class="section-title">🖼️ Top 5 Highest Image Quality</h3>
-                <div class="artifact-list" id="highestImageQualityList" role="list" aria-label="Artifacts with the highest image quality">
-                    <div class="loading analysis-loading">
-                        <span>Analyzing image quality...</span>
-                        <span class="analysis-progress" id="highestQualityProgress">0/0</span>
-                    </div>
+        <!-- Enhanced Image Quality Section -->
+        <section class="image-quality-section" aria-labelledby="image-quality-heading">
+            <h2 id="image-quality-heading" class="section-title">🖼️ Image Quality Analysis</h2>
+            
+            <!-- Image Quality Mode Selector -->
+            <div class="image-quality-controls">
+                <div class="quality-mode-selector">
+                    <label for="imageQualityModeSelect" class="quality-mode-label">Analyze by:</label>
+                    <select id="imageQualityModeSelect" class="quality-mode-select" aria-describedby="quality-mode-description">
+                        <option value="overall">Overall Quality (Combined Score)</option>
+                        <option value="aspect-ratio">Aspect Ratio (4:3 to 16:9 preferred)</option>
+                        <option value="pixel-size">Pixel Size (Higher resolution preferred)</option>
+                    </select>
+                    <p id="quality-mode-description" class="sr-only">
+                        Choose which metric to use for ranking image quality in the lists below.
+                    </p>
                 </div>
             </div>
 
-            <div class="list-section">
-                <h3 class="section-title">📉 Top 5 Lowest Image Quality</h3>
-                <div class="artifact-list" id="lowestImageQualityList" role="list" aria-label="Artifacts with the lowest image quality">
-                    <div class="loading analysis-loading">
-                        <span>Analyzing image quality...</span>
-                        <span class="analysis-progress" id="lowestQualityProgress">0/0</span>
+            <div class="lists-container">
+                <div class="list-section" id="highestImageQualitySection">
+                    <h3 class="section-title">🖼️ Top 5 Highest Overall Quality</h3>
+                    <div class="artifact-list" id="highestImageQualityList" role="list" aria-label="Artifacts with the highest image quality">
+                        <div class="loading analysis-loading">
+                            <span>Analyzing image quality...</span>
+                            <span class="analysis-progress" id="highestQualityProgress">0/0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="list-section" id="lowestImageQualitySection">
+                    <h3 class="section-title">📉 Top 5 Lowest Overall Quality</h3>
+                    <div class="artifact-list" id="lowestImageQualityList" role="list" aria-label="Artifacts with the lowest image quality">
+                        <div class="loading analysis-loading">
+                            <span>Analyzing image quality...</span>
+                            <span class="analysis-progress" id="lowestQualityProgress">0/0</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -282,7 +302,7 @@
 
         <!-- Error Message -->
         <div class="error-message" id="errorMessage" style="display: none;" role="alert" aria-live="assertive">
-            <h3>⚠ Error Loading Data</h3>
+            <h3>⚠️ Error Loading Data</h3>
             <p>Could not load artifactlist.json. Please ensure the file is in the same directory as this HTML file and try refreshing the page.</p>
         </div>
     </div>
