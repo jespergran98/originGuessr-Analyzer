@@ -6,7 +6,7 @@ class ArtifactAnalyzer {
     constructor() {
         this.artifacts = [];
         this.map = null;
-        this.timeframeBoundaries = [-5000000, -500000, -100000, -10000, -1000, 0, 500, 750, 1000, 1250, 1500, 1750, 1900, 2025];
+        this.timeframeBoundaries = [-5000000, -500000, -100000, -10000, -1000, 0, 500, 1000, 1250, 1500, 1750, 1900, 2025];
         this.displayedArtifacts = 0;
         this.artifactsPerPage = 12;
         this.sortedArtifacts = [];
