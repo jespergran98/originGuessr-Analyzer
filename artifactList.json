@@ -38,14 +38,14 @@
     },
     {
       "title": "Terracotta Army",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/51714-Terracota-Army.jpg/800px-51714-Terracota-Army.jpg?20240411150157",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Terracotta_Army_%286143564816%29.jpg",
       "lat": 34.3855,
       "lng": 109.2731,
       "year": -210,
-      "description": "The Terracotta Army: life-sized sculptures depicting the armies of Qin Shi Huang, first Emperor of China.",
-      "author": "xiquinhosilva",
-      "authorLink": "https://www.flickr.com/people/7138083@N04",
-      "license": "CC BY 2.0",
+      "description": "Over 8,000 life-sized clay warriors and horses buried to protect emperor in afterlife.",
+      "author": "kevinmcgill",
+      "authorLink": "https://www.flickr.com/people/42479008@N02",
+      "license": "CC BY-SA 2.0",
       "isPlayable": true
     },
     {
@@ -87,10 +87,10 @@
     {
       "title": "Shroud of Turin",
       "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Full_length_negatives_of_the_shroud_of_Turin.jpg/1280px-Full_length_negatives_of_the_shroud_of_Turin.jpg",
-      "lat": 45.0703,
-      "lng": 7.6869,
-      "year": 1325,
-      "description": "Linen cloth bearing faint image of crucified man, claimed as Jesus' burial shroud, debated authenticity.",
+      "lat": 45.0733,
+      "lng": 7.6854,
+      "year": 0,
+      "description": "Linen bearing mysterious human imprint sparking religious debate; radiocarbon dates it medieval, newer studies suggest year 0.",
       "author": "Public Domain",
       "authorLink": null,
       "license": null,
@@ -134,14 +134,14 @@
     },
     {
       "title": "Book of Kells",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Dublin_Trinity_College_Library_Long_Room_Book_of_Kells_1.jpg/640px-Dublin_Trinity_College_Library_Long_Room_Book_of_Kells_1.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/b/b1/KellsFol032vChristEnthroned.jpg",
       "lat": 53.35,
       "lng": 6.26,
       "year": 800,
       "description": "The Book of Kells is a lavishly decorated manuscript of the Gospels from the early medieval period.",
-      "author": "Zairon",
-      "authorLink": "https://commons.wikimedia.org/wiki/User:Zairon",
-      "license": "CC BY 4.0",
+      "author": "Public Domain",
+      "authorLink": null,
+      "license": null,
       "isPlayable": true
     },
     {
@@ -350,14 +350,14 @@
     },
     {
       "title": "Phaistos Disc",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Diskos_von_Phaistos_%28Seite_A%29_01.jpg/640px-Diskos_von_Phaistos_%28Seite_A%29_01.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Phaistos_Disc_-_Side_A_-_6380_-_crop1.jpg/2175px-Phaistos_Disc_-_Side_A_-_6380_-_crop1.jpg",
       "lat": 35.05,
       "lng": 24.81,
       "year": -1850,
       "description": "Mysterious Minoan clay disc with unique spiral script that remains completely undeciphered today.",
-      "author": "Olaf Tausch",
-      "authorLink": "https://commons.wikimedia.org/wiki/User:Oltau",
-      "license": "CC BY 3.0",
+      "author": "C messier",
+      "authorLink": "https://commons.wikimedia.org/wiki/User:C_messier",
+      "license": "CC BY-SA 4.0",
       "isPlayable": true
     },
     {
@@ -374,14 +374,14 @@
     },
     {
       "title": "Mask of Agamemnon",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Gold_death-mask_known_as_%E2%80%98Mask_of_Agamemnon%2C%E2%80%99_Mycenae%2C_Grave_Circle_A%2C_Grave_V%2C_16th_cent._BC._%2828423089016%29.jpg/640px-Gold_death-mask_known_as_%E2%80%98Mask_of_Agamemnon%2C%E2%80%99_Mycenae%2C_Grave_Circle_A%2C_Grave_V%2C_16th_cent._BC._%2828423089016%29.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/1/17/The_mask_of_agamemnon.jpg",
       "lat": 37.73,
       "lng": 22.76,
       "year": -1550,
       "description": "The Mask of Agamemnon is a gold funeral mask from Mycenae's royal tombs.",
-      "author": "Public Domain",
-      "authorLink": null,
-      "license": null,
+      "author": "Pauk",
+      "authorLink": "https://commons.wikimedia.org/wiki/User:Pauk",
+      "license": "CC BY 2.0",
       "isPlayable": true
     },
     {
@@ -518,14 +518,14 @@
     },
     {
       "title": "Ishtar Gate",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Ishtar_Gate_at_Berlin_Museum.jpg/800px-Ishtar_Gate_at_Berlin_Museum.jpg?20061127123618",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/%D8%A8%D9%88%D8%A7%D8%A8%D8%A9_%D8%B9%D8%B4%D8%AA%D8%A7%D8%B1_2.jpg/1920px-%D8%A8%D9%88%D8%A7%D8%A8%D8%A9_%D8%B9%D8%B4%D8%AA%D8%A7%D8%B1_2.jpg",
       "lat": 32.54,
       "lng": 44.42,
       "year": -575,
       "description": "The Ishtar Gate was Babylon's ceremonial entrance decorated with glazed blue bricks.",
-      "author": "Rictor Norton",
-      "authorLink": "https://www.flickr.com/photos/rictor-and-david/",
-      "license": "CC BY 2.0",
+      "author": "Ali Luay Al-Qaisi",
+      "authorLink": "https://commons.wikimedia.org/w/index.php?title=User:Ali_Luay_Al-Qaisi&action=edit&redlink=1",
+      "license": "CC BY-SA 4.0",
       "isPlayable": true
     },
     {
@@ -814,18 +814,6 @@
       "author": "Richard Mortel",
       "authorLink": "https://www.flickr.com/photos/prof_richard/31050135517/",
       "license": "CC BY 2.0",
-      "isPlayable": true
-    },
-    {
-      "title": "Jōmon Pottery",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/9/9f/JomonPottery.JPG",
-      "lat": 35.6762,
-      "lng": 139.6503,
-      "year": -10000,
-      "description": "World's oldest pottery tradition featuring intricate cord-marked patterns and elaborate forms.",
-      "author": "Public Domain",
-      "authorLink": null,
-      "license": null,
       "isPlayable": true
     },
     {
@@ -2079,10 +2067,10 @@
     {
       "title": "Winged Victory of Samothrace",
       "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Victoire_de_Samothrace_-_Musee_du_Louvre_-_20190812.jpg/1024px-Victoire_de_Samothrace_-_Musee_du_Louvre_-_20190812.jpg",
-      "lat": 39.5094,
-      "lng": 24.7139,
+      "lat": 40.4833,
+      "lng": 25.5167,
       "year": -190,
-      "description": "Hellenistic marble goddess of triumph on ship's prow.",
+      "description": "Dramatic Hellenistic Nike statue with flowing drapery, originally stood in Samothrace sanctuary.",
       "author": "Public Domain",
       "authorLink": null,
       "license": null,
@@ -2535,14 +2523,14 @@
     },
     {
       "title": "Enigma Machine",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/6/6c/Bundesarchiv_Bild_146-2006-0188%2C_Verschl%C3%BCsselungsger%C3%A4t_%22Enigma%22.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/af/Enigma_04.jpg/1920px-Enigma_04.jpg",
       "lat": 52.5200,
       "lng": 13.4050,
       "year": 1923,
       "description": "German-engineered cipher machine that encrypted Nazi communications during World War II.",
-      "author": "Bundesarchiv",
-      "authorLink": null,
-      "license": "CC BY-SA 3.0",
+      "author": "Punishar",
+      "authorLink": "https://commons.wikimedia.org/wiki/User:Punishar",
+      "license": "CC BY-SA 4.0",
       "isPlayable": true
     },
     {
@@ -2559,14 +2547,14 @@
     },
     {
       "title": "Vinča Tablets",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Tartaria2.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Tat%C3%A1rlakai_korong.JPG/1920px-Tat%C3%A1rlakai_korong.JPG",
       "lat": 44.7500,
       "lng": 21.1833,
       "year": -5000,
       "description": "These proto-writing symbols from Neolithic Serbia may represent humanity's earliest script.",
-      "author": "FlorinCB",
-      "authorLink": null,
-      "license": "CC BY 3.0",
+      "author": "Balogg",
+      "authorLink": "https://commons.wikimedia.org/w/index.php?title=User:Balogg&action=edit&redlink=1",
+      "license": "CC BY-SA 3.0",
       "isPlayable": true
     },
     {
@@ -2920,10 +2908,10 @@
     {
       "title": "Apollo Guidance Computer",
       "image": "https://upload.wikimedia.org/wikipedia/commons/7/79/Agc_view.jpg",
-      "lat": 42.3889,
-      "lng": -71.1389,
-      "year": 1966,
-      "description": "The Apollo Guidance Computer navigated NASA's lunar missions in the 1960s.",
+      "lat": 42.3600,
+      "lng": -71.0920,
+      "year": 1961,
+      "description": "Revolutionary miniaturized computer using integrated circuits, navigated NASA's lunar missions in the 1960s.",
       "author": "Public Domain",
       "authorLink": null,
       "license": null,
@@ -3403,7 +3391,7 @@
       "lat": 34.9858,
       "lng": 135.7689,
       "year": 1998,
-      "description": "Tamamushi Uni Magikarp card. '98 Japan promo card for top trainers; rare prize, few made.  Recent sale: $66,100.",
+      "description": "Tamamushi Uni Magikarp card. '98 Japan promo card; rare prize and only a few made. Recent sale: $66,100.",
       "author": "PSA",
       "authorLink": "https://www.psacard.com/cardfacts/non-sports-cards/1998-nintendo-pokemon-japanese-promo/university-magikarp-tamamushi-univ-prize-129/640815",
       "license": null,
@@ -3879,7 +3867,7 @@
     },
     {
       "title": "Acropolis of Athens",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Erechtheum_Acropolis_Athens.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Erechtheum_Acropolis_Athens.jpg/2560px-Erechtheum_Acropolis_Athens.jpg",
       "lat": 37.9715,
       "lng": 23.7257,
       "year": -450,
@@ -3999,14 +3987,14 @@
     },
     {
       "title": "Jelling Stones",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/6/66/Jelling_gr_Stein_3.JPG",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/The_Jelling_Stone_-_VIKING_exhibition_at_the_National_Museum_of_Denmark_-_Photo_The_National_Museum_of_Denmark_%289084035770%29.jpg/1024px-The_Jelling_Stone_-_VIKING_exhibition_at_the_National_Museum_of_Denmark_-_Photo_The_National_Museum_of_Denmark_%289084035770%29.jpg",
       "lat": 55.7558,
       "lng": 9.4194,
       "year": 965,
       "description": "The Jelling Stones are runestones erected by Harald Bluetooth to commemorate Denmark's Christianization.",
-      "author": "Casiopeia",
-      "authorLink": "https://de.wikipedia.org/wiki/Benutzer:Casiopeia",
-      "license": "CC BY-SA 2.0 de",
+      "author": "Nationalmuseet",
+      "authorLink": "https://www.flickr.com/people/29246403@N03",
+      "license": "CC BY-SA 2.0",
       "isPlayable": true
     },
     {
@@ -4683,14 +4671,14 @@
     },
     {
       "title": "Apollo 11 Cave Stone Plaque",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Apollo-11-cave-therianthrope.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Apollo_11_Cave_painting_1.jpg/2560px-Apollo_11_Cave_painting_1.jpg",
       "lat": -27.7500,
       "lng": 17.6000,
       "year": -26000,
       "description": "Ancient rock art featuring therianthropic figures, representing Africa's oldest known figurative art.",
-      "author": "Public Domain",
-      "authorLink": null,
-      "license": null,
+      "author": "Thilo Parg",
+      "authorLink": "https://commons.wikimedia.org/wiki/User:Thilo_Parg",
+      "license": "CC BY-SA 4.0",
       "isPlayable": true
     },
     {
@@ -4715,18 +4703,6 @@
       "author": "Public Domain",
       "authorLink": null,
       "license": null,
-      "isPlayable": true
-    },
-    {
-      "title": "Cosquer Cave Hand Stencil",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/e/ed/Prehistoric_Hand_Outline_Cosquer_Cave.JPG",
-      "lat": 43.2044,
-      "lng": 5.4400,
-      "year": -27000,
-      "description": "The Cosquer Cave Hand Stencil shows unique fingerless outlines from a submerged cave near Marseille France.",
-      "author": "SiefkinDR",
-      "authorLink": "https://commons.wikimedia.org/wiki/User:SiefkinDR",
-      "license": "CC BY-SA 3.0",
       "isPlayable": true
     },
     {
@@ -4859,18 +4835,6 @@
       "author": "Gerbil",
       "authorLink": "https://commons.wikimedia.org/wiki/User:Gerbil",
       "license": "CC BY 3.0",
-      "isPlayable": true
-    },
-    {
-      "title": "Boxgrove Tibia",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Boxgrove-Tibia.jpg",
-      "lat": 50.8597,
-      "lng": -0.7050,
-      "year": -500000,
-      "description": "Oldest British human bone revealing robust build and active lifestyle of early Europeans.",
-      "author": "Locutus Borg",
-      "authorLink": "https://commons.wikimedia.org/wiki/User:Locutus_Borg",
-      "license": "CC BY-SA 4.0",
       "isPlayable": true
     },
     {
@@ -5248,10 +5212,10 @@
     {
       "title": "SpaceX Starship",
       "image": "https://upload.wikimedia.org/wikipedia/commons/4/4a/SpaceX_Starship_ignition_during_IFT-5.jpg",
-      "lat": 33.9207,
-      "lng": -118.3287,
-      "year": 2019,
-      "description": "Fully reusable super-heavy launch vehicle designed for Mars colonization and deep space missions.",
+      "lat": 25.9972,
+      "lng": -97.1561,
+      "year": 2018,
+      "description": "World's most powerful rocket system with reusable stages, designed for Mars missions and beyond.",
       "author": "Steve Jurvetson",
       "authorLink": "https://www.flickr.com/people/jurvetson/",
       "license": "CC BY 2.0",
@@ -5355,13 +5319,13 @@
     },
     {
       "title": "Sima de los Huesos Cranium 5 Miguelón",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Skull5_complete_3quarters_Sima_de_los_Huesos.jpg/1920px-Skull5_complete_3quarters_Sima_de_los_Huesos.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Homo_heidelbergensis._Museo_de_Prehistoria_de_Valencia.jpg/1024px-Homo_heidelbergensis._Museo_de_Prehistoria_de_Valencia.jpg",
       "lat": 42.3500,
       "lng": -3.5170,
       "year": -430000,
       "description": "Homo heidelbergensis skull revealing crucial insights into human evolutionary development.",
-      "author": "UtaUtaNapishtim",
-      "authorLink": "https://commons.wikimedia.org/wiki/User:UtaUtaNapishtim",
+      "author": "Jerónimo Roure Pérez",
+      "authorLink": null,
       "license": "CC BY-SA 4.0",
       "isPlayable": true
     },
@@ -6098,18 +6062,6 @@
       "isPlayable": true
     },
     {
-      "title": "Inca Gold Llama",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/d/d0/AHOTWgold_lama.JPG",
-      "lat": -13.532,
-      "lng": -71.9675,
-      "year": 1500,
-      "description": "Inca gold llama figurines symbolizing Andean wealth from Cusco, Peru.",
-      "author": "geni",
-      "authorLink": null,
-      "license": "CC BY-SA 4.0",
-      "isPlayable": true
-    },
-    {
       "title": "Timurid Jade Dragon Cup",
       "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Jade_dragon_cup_4.jpg/2560px-Jade_dragon_cup_4.jpg",
       "lat": 39.6542,
@@ -6122,11 +6074,11 @@
       "isPlayable": true
     },
     {
-      "title": "Dürer's Rhinoceros (1515)",
+      "title": "Dürer's Rhinoceros",
       "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/D%C3%BCrer%27s_Rhinoceros%2C_1515.jpg/1920px-D%C3%BCrer%27s_Rhinoceros%2C_1515.jpg",
       "lat": 49.452,
       "lng": 11.0768,
-      "year": 1515,
+      "year": 1513,
       "description": "Dürer's Rhinoceros woodcut illustrates Renaissance curiosity in Nuremberg, Germany.",
       "author": "Public Domain",
       "authorLink": null,
@@ -6519,13 +6471,13 @@
     },
     {
       "title": "Gold Mask of Amenemope",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/c/c6/Amenemope_Mask_Crop.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Mask_of_pharaoh_Amenemope_cropped.jpg/1280px-Mask_of_pharaoh_Amenemope_cropped.jpg",
       "lat": 30.9667,
       "lng": 31.8833,
       "year": -990,
       "description": "Exquisite Third Intermediate Period funerary mask showcasing ancient Egyptian goldwork mastery.",
-      "author": "John Campana",
-      "authorLink": "https://www.flickr.com/people/10647023@N04/",
+      "author": "Dale Cruise",
+      "authorLink": null,
       "license": "CC BY 2.0",
       "isPlayable": true
     },
@@ -6987,14 +6939,14 @@
     },
     {
       "title": "Koh Ker Pyramid",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/6/6d/0505280017PThompyramid.jpg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/04-Koh_Ker-nX-19.jpg/1920px-04-Koh_Ker-nX-19.jpg",
       "lat": 14.3833,
       "lng": 104.6833,
       "year": 928,
       "description": "Unique seven-tiered step pyramid built by Khmer King Jayavarman IV in Cambodia.",
-      "author": "Public Domain",
-      "authorLink": null,
-      "license": null,
+      "author": "PsamatheM",
+      "authorLink": "https://commons.wikimedia.org/wiki/User:PsamatheM",
+      "license": "CC BY-SA 4.0",
       "isPlayable": true
     },
     {
@@ -7034,7 +6986,7 @@
       "isPlayable": true
     },
     {
-      "title": "Colossus of Rhodes (reconstruction)",
+      "title": "Colossus of Rhodes",
       "image": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Colossus_of_Rhodes2.jpg",
       "lat": 36.4511,
       "lng": 28.2278,
@@ -7407,14 +7359,14 @@
     },
     {
       "title": "Trajan's Column",
-      "image": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Trajan%27s_Column_Panorama.jpeg",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/7964_-_Roma_-_Colonna_traianea_-_San_Pietro_-_Foto_Giovanni_Dall%27Orto%2C_6-Apr-2008.jpg/1024px-7964_-_Roma_-_Colonna_traianea_-_San_Pietro_-_Foto_Giovanni_Dall%27Orto%2C_6-Apr-2008.jpg",
       "lat": 41.8958,
       "lng": 12.4842,
       "year": 113,
       "description": "Magnificent Roman column commemorating Dacian Wars through intricate spiral relief carvings.",
-      "author": "Juan Francisco Adame Lorite",
-      "authorLink": "https://commons.wikimedia.org/w/index.php?title=User:Franjuan&action=edit&redlink=1",
-      "license": "CC BY 3.0",
+      "author": "Giovanni Dall'Orto",
+      "authorLink": "https://commons.wikimedia.org/wiki/User:G.dallorto",
+      "license": null,
       "isPlayable": true
     },
     {
